@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 
@@ -11,7 +8,9 @@ namespace VirusGame
     {
         private List<Button> Cells = new List<Button>();
         private List<string> Players = new List<string>();
+        private List<string> DeadPlayers = new List<string>();
         private int currentPlayerIndex;
+        SolidColorBrush playerBrush;
         private int cellLimit = 3;
 
         private string[] playerColors = { "Blue", "Red", "Green", "Yellow" };
@@ -33,7 +32,6 @@ namespace VirusGame
             {
                 cell.Background = Brushes.LightGray;
                 cell.IsEnabled = true;
-                cell.FontSize = 14;
                 cell.Content = string.Empty;
             }
 
@@ -43,9 +41,8 @@ namespace VirusGame
                 Button startCell = Cells[corners[i]];
                 startCell.Background = new BrushConverter().ConvertFromString(playerColors[i]) as SolidColorBrush;
             }
-            currentPlayerIndex = 0;
-            cellLimit = 3;
-            turnLabel.Content = "Turn: " + Players[currentPlayerIndex];
+
+            skipTurn(true);
             gameStarted = true;
         }
 
@@ -58,6 +55,7 @@ namespace VirusGame
                     Button newCell = new Button();
                     newCell.Width = 50;
                     newCell.Height = 50;
+                    newCell.FontSize = 36;
                     newCell.Background = Brushes.LightGray;
                     newCell.Click += (sender, e) => Cell_Click(sender);
 
@@ -82,19 +80,13 @@ namespace VirusGame
 
             if (isSurrounded(Players[currentPlayerIndex]))
             {
+                MessageBox.Show(Players[currentPlayerIndex] + " Was Surrounded!");
+                DeadPlayers.Add(Players[currentPlayerIndex]);
                 skipTurn();
-
-                if (Players.Count == 1)
-                {
-                    MessageBox.Show(Players[0] + " Wins!");
-                    Players.Clear();
-                    InitializeGrid();
-                    gameStarted = false;
-                    return;
-                }
+                return;
             }
 
-            if (clickedCell.Background.ToString() == new BrushConverter().ConvertFromString(Players[currentPlayerIndex]).ToString())
+            if (clickedCell.Background == playerBrush)
             {
                 return;
             }
@@ -105,10 +97,9 @@ namespace VirusGame
                 {
                     clickedCell.IsEnabled = false;
                     clickedCell.Content = "♜";
-                    clickedCell.FontSize = 36;
-                    clickedCell.Foreground = new BrushConverter().ConvertFromString(Players[currentPlayerIndex]) as SolidColorBrush;
+                    clickedCell.Foreground = playerBrush;
                 }
-                clickedCell.Background = new BrushConverter().ConvertFromString(Players[currentPlayerIndex]) as SolidColorBrush;
+                clickedCell.Background = playerBrush;
                 cellLimit--;
 
                 if (cellLimit == 0)
@@ -118,17 +109,23 @@ namespace VirusGame
             }
         }
 
-        private bool isAdjacentColor(int index)
+        private List<int> adjacentCells = new List<int>();
+        private void updateAdjacent(int index)
         {
-            List<int> adjacentCells = new List<int>();
+            adjacentCells.Clear();
             if (index % 10 > 0) adjacentCells.Add(index - 1); // Left
             if (index % 10 < 9) adjacentCells.Add(index + 1); // Right
             if (index / 10 > 0) adjacentCells.Add(index - 10); // Above
             if (index / 10 < 9) adjacentCells.Add(index + 10); // Below
+        }
+                    
 
+        private bool isAdjacentColor(int index)
+        {
+            updateAdjacent(index);
             foreach (int cellIndex in adjacentCells)
             {
-                if (Cells[cellIndex].Background.ToString() == new BrushConverter().ConvertFromString(Players[currentPlayerIndex]).ToString())
+                if (Cells[cellIndex].Background == playerBrush)
                 {
                     return true;
                 }
@@ -139,26 +136,18 @@ namespace VirusGame
 
         private bool isSurrounded(string playerColor)
         {
-            SolidColorBrush playerBrush = new BrushConverter().ConvertFromString(Players[currentPlayerIndex]) as SolidColorBrush;
-
             for (int i = 0; i < Cells.Count; i++) {
                 if (Cells[i].Background == playerBrush) {
-                    List<int> adjacentCells = new List<int>();
-                    if (i % 10 > 0) adjacentCells.Add(i - 1); // Left
-                    if (i % 10 < 9) adjacentCells.Add(i + 1); // Right
-                    if (i / 10 > 0) adjacentCells.Add(i - 10); // Above
-                    if (i / 10 < 9) adjacentCells.Add(i + 10); // Below
-
+                    updateAdjacent(i);
                     foreach (int cellIndex in adjacentCells)
                     {
-                        if (Cells[cellIndex].Background == Brushes.LightGray)
+                        if (Cells[cellIndex].Background == Brushes.LightGray || (Cells[cellIndex].Background != playerBrush && Cells[cellIndex].IsEnabled == true))
                         {
                             return false;
                         }
                     }
                 }      
             }
-
             return true;
         }
 
@@ -167,11 +156,27 @@ namespace VirusGame
             skipTurn();
         }
 
-        private void skipTurn()
+        private void skipTurn(bool newGame = false)
         {
-            currentPlayerIndex = (currentPlayerIndex + 1) % Players.Count;
+            if (newGame) { currentPlayerIndex = 0; } else
+            { currentPlayerIndex = (currentPlayerIndex + 1) % Players.Count; }
+
             cellLimit = 3;
             turnLabel.Content = "Turn: " + Players[currentPlayerIndex];
+            playerBrush = new BrushConverter().ConvertFromString(Players[currentPlayerIndex]) as SolidColorBrush;
+
+            if (DeadPlayers.Count == Players.Count - 1)
+            {
+                MessageBox.Show("Game Over!");
+                gameStarted = false;
+                return;
+            }
+
+            if (DeadPlayers.Contains(Players[currentPlayerIndex]))
+            {
+                skipTurn();
+                return;
+            }
         }
     }
 }
