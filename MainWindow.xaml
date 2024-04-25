@@ -1,0 +1,46 @@
+﻿<Window
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:av="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="av" x:Class="VirusGame.MainWindow"
+        Title="MainWindow" Height="600" Width="500" ResizeMode="CanMinimize" SizeToContent="WidthAndHeight">
+    <Grid Margin="1,0,-1,0">
+        <Grid x:Name="CellGrid" Margin="0,0,0,90">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Rectangle Grid.ColumnSpan="10" HorizontalAlignment="Left" Height="500" Grid.RowSpan="10" Stroke="Black" VerticalAlignment="Top" Width="500" Fill="#FF0D69FF"/>
+        </Grid>
+        <Button x:Name="newGameButton" Content="New Game" HorizontalAlignment="Left" VerticalAlignment="Bottom" Height="30" Width="80" Margin="152,0,0,32" Click="newGameButton_Click" Foreground="Black"/>
+
+        <ComboBox x:Name="playerComboBox" HorizontalAlignment="Left" Margin="16,0,0,32" VerticalAlignment="Bottom" Width="120" Height="30">
+            <ComboBoxItem Content="2 Players"/>
+            <ComboBoxItem Content="3 Players"/>
+            <ComboBoxItem Content="4 Players"/>
+        </ComboBox>
+
+        <Label x:Name="turnLabel" Content="Turn:" HorizontalAlignment="Left" Margin="248,0,0,32" VerticalAlignment="Bottom" Height="30" Width="80"/>
+        <Button x:Name="skipTurnButton" Content="Skip Turn" HorizontalAlignment="Left" VerticalAlignment="Bottom" Height="30" Width="80" Margin="393,0,0,32" Click="skipTurnButton_Click" Foreground="Black"/>
+    </Grid>
+
+</Window>
